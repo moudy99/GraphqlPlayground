@@ -1,5 +1,6 @@
 
 using GraphQLMinimalAPI.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace GraphQLMinimalAPI
 {
@@ -12,12 +13,19 @@ namespace GraphQLMinimalAPI
             // Add services to the container.
             builder.Services.AddAuthorization();
 
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+                    b=>b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             // Here add graphql server
-            builder.Services.AddGraphQLServer().AddQueryType<Query>();
+            builder.Services.AddGraphQLServer()
+                .AddQueryType<Query>();
 
             var app = builder.Build();
 
@@ -32,9 +40,10 @@ namespace GraphQLMinimalAPI
 
             app.UseAuthorization();
 
-            app.MapGraphQL("");
+            app.MapGraphQL("/graphql");
 
 
+            app.MapGet("test", () => "TEST");
             app.Run();
         }
     }

@@ -1,23 +1,32 @@
-﻿namespace GraphQLMinimalAPI.Schema
+﻿using Bogus;
+using Microsoft.EntityFrameworkCore;
+
+namespace GraphQLMinimalAPI.Schema
 {
     public class Query
     {
+        private readonly ApplicationDbContext _context;
 
-        //here i defind and methods [Query] that will be exposed to the client -- this methods called fields in Graphql and the name of this mehtod 
-        // will be the name of the filed that i can use it 
+        public Query(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-        [GraphQLDeprecated("This field is deprecated")]
-        public string instuctions() => "wwwwwwwwwwwwwwwww";
+        public async Task<List<User>> GetUsers() => await _context.Users.ToListAsync();
+        public async Task<List<Product>> GetProducts() => await _context.Products.ToListAsync();
+        public async Task<List<Order>> GetOrders() => await _context.Orders.ToListAsync();
+        public async Task<List<Category>> GetCategories() => await _context.Categories.ToListAsync();
+        public async Task<List<Review>> GetReviews() => await _context.Reviews.ToListAsync();
+        public async Task<List<Wishlist>> GetWishlists() => await _context.Wishlists.ToListAsync();
+        public async Task<List<Coupon>> GetCoupons() => await _context.Coupons.ToListAsync();
+        public async Task<List<ShippingDetail>> GetShippingDetails() => await _context.ShippingDetails.ToListAsync();
+        public async Task<List<Message>> GetMessages() => await _context.Messages.ToListAsync();
 
-        public Player GetPlayer() => new Player { club = "Real Madrid", Name = "Veni" };
 
-      
-    }
+        public async Task<Product?> GetProductById(int id) =>
+    await _context.Products.Include(p => p.Category)
+                           .Include(p => p.Reviews)
+                           .FirstOrDefaultAsync(p => p.Id == id);
 
-    public class Player()
-    {
-        public string Name { get; set; }
-
-        public string club {  get; set; }
     }
 }
